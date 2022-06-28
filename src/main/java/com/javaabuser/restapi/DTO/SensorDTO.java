@@ -1,14 +1,17 @@
 package com.javaabuser.restapi.DTO;
 
-import org.hibernate.validator.constraints.Range;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
+@NoArgsConstructor
+@Getter
+@Setter
 public class SensorDTO {
-    @NotBlank
-    @Range(min = 3, max = 30)
+    @NotNull
+    @Size(min = 3, max = 30)
     private String name;
-
-    public SensorDTO() {
-    }
 }
