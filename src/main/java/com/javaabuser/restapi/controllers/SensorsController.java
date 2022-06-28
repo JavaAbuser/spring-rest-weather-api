@@ -3,6 +3,7 @@ package com.javaabuser.restapi.controllers;
 import com.javaabuser.restapi.DTO.SensorDTO;
 import com.javaabuser.restapi.exceptions.sensor.ErrorResponse;
 import com.javaabuser.restapi.exceptions.sensor.NotCreatedException;
+import com.javaabuser.restapi.exceptions.sensor.NotFoundException;
 import com.javaabuser.restapi.models.Sensor;
 import com.javaabuser.restapi.services.SensorsService;
 import com.javaabuser.restapi.util.SensorValidator;
@@ -17,6 +18,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/sensors")
@@ -31,6 +33,20 @@ public class SensorsController {
         this.modelMapper = modelMapper;
         this.sensorValidator = sensorValidator;
     }
+
+    @GetMapping()
+    public ResponseEntity<List<SensorDTO>> getSensors(){
+        return ResponseEntity.status(HttpStatus.OK).body(sensorsService.findAll().stream().map(this::convertToSensorDTO).collect(Collectors.toList()));
+    }
+
+//    @GetMapping()
+//    public ResponseEntity<Sensor> getSensorByName(@RequestParam("name") String name){
+//        if(sensorsService.findByName(name).isPresent()){
+//            return new ResponseEntity<Sensor>(sensorsService.findByName(name).get(), HttpStatus.FOUND);
+//        } else {
+//            throw new NotFoundException("Not found sensor with this name.");
+//        }
+//    }
 
     @PostMapping("/registration")
     public ResponseEntity<HttpStatus> register(@RequestBody @Valid SensorDTO sensorDTO,
@@ -49,16 +65,26 @@ public class SensorsController {
             }
             throw new NotCreatedException(errorsMessage.toString());
         }
+        sensorsService.save(sensor);
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
     private Sensor convertToSensor(SensorDTO sensorDTO){
         return modelMapper.map(sensorDTO, Sensor.class);
     }
+    private SensorDTO convertToSensorDTO(Sensor sensor){
+        return modelMapper.map(sensor, SensorDTO.class);
+    }
 
     @ExceptionHandler
     private ResponseEntity<ErrorResponse> handleNotCreatedException(NotCreatedException exception){
         ErrorResponse errorResponse = new ErrorResponse(exception.getMessage(), new Date());
         return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.BAD_REQUEST);
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException exception){
+        ErrorResponse errorResponse = new ErrorResponse(exception.getMessage(), new Date());
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.NOT_FOUND);
     }
 }
