@@ -4,7 +4,7 @@ import lombok.Data;
 import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.NotNull;
 import java.util.Date;
 
 @Entity
@@ -20,7 +20,7 @@ public class Measurement {
     @Column(name = "value")
     private int value;
 
-    @NotEmpty
+    @NotNull
     @Column(name = "isRaining")
     private boolean isRaining;
 
