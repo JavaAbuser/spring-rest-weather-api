@@ -1,19 +1,23 @@
 package com.javaabuser.restapi.DTO;
 
 import com.javaabuser.restapi.models.Sensor;
-import org.hibernate.validator.constraints.Range;
+import lombok.Getter;
+import lombok.NoArgsConstructor;
+import lombok.Setter;
 
-import javax.validation.constraints.NotEmpty;
+import javax.validation.constraints.Max;
+import javax.validation.constraints.Min;
+import javax.validation.constraints.NotNull;
 
+@NoArgsConstructor
+@Getter
+@Setter
 public class MeasurementDTO {
-
-    @Range(min = -100, max = 100)
+    @Min(value = -100)
+    @Max(value = 100)
     private double value;
-    @NotEmpty
+    @NotNull
     private boolean isRaining;
-    @NotEmpty
+    @NotNull
     private Sensor sensor;
-
-    public MeasurementDTO() {
-    }
 }
