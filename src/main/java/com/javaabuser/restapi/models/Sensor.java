@@ -1,10 +1,10 @@
 package com.javaabuser.restapi.models;
 
 import lombok.Data;
-import org.hibernate.validator.constraints.Range;
 
 import javax.persistence.*;
-import javax.validation.constraints.NotBlank;
+import javax.validation.constraints.NotNull;
+import javax.validation.constraints.Size;
 
 @Entity
 @Table(name = "Sensor")
@@ -15,8 +15,8 @@ public class Sensor {
     @Column(name = "id")
     private int id;
 
-    @NotBlank
-    @Range(min = 3, max = 30)
+    @NotNull
+    @Size(min = 3, max = 30)
     @Column(name = "name")
     private String name;
 }
