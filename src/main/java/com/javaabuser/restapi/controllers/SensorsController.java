@@ -35,23 +35,25 @@ public class SensorsController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<SensorDTO>> getSensors(){
-        return ResponseEntity.status(HttpStatus.OK).body(sensorsService.findAll().stream().map(this::convertToSensorDTO).collect(Collectors.toList()));
+    public ResponseEntity<List<SensorDTO>> getSensors(@RequestParam(value = "name", required = false) String name){
+        if(name != null){
+            if(sensorsService.findByName(name).isPresent()){
+                return ResponseEntity.status(HttpStatus.OK).body(sensorsService.findByName(name).stream().map(this::convertToSensorDTO).collect(Collectors.toList()));
+            }
+            else {
+                throw new NotFoundException("Not found sensor with this name");
+            }
+        }
+        else {
+            return ResponseEntity.status(HttpStatus.OK).body(sensorsService.findAll().stream().map(this::convertToSensorDTO).collect(Collectors.toList()));
+        }
     }
-
-//    @GetMapping()
-//    public ResponseEntity<Sensor> getSensorByName(@RequestParam("name") String name){
-//        if(sensorsService.findByName(name).isPresent()){
-//            return new ResponseEntity<Sensor>(sensorsService.findByName(name).get(), HttpStatus.FOUND);
-//        } else {
-//            throw new NotFoundException("Not found sensor with this name.");
-//        }
-//    }
 
     @PostMapping("/registration")
     public ResponseEntity<HttpStatus> register(@RequestBody @Valid SensorDTO sensorDTO,
                                                BindingResult bindingResult){
         Sensor sensor = convertToSensor(sensorDTO);
+
         sensorValidator.validate(sensor, bindingResult);
 
         if(bindingResult.hasErrors()){
@@ -60,12 +62,13 @@ public class SensorsController {
             for(FieldError error : errors){
                 errorsMessage
                         .append(error.getField())
-                        .append("-").append(error.getDefaultMessage())
+                        .append(" - ").append(error.getDefaultMessage())
                         .append(";");
             }
             throw new NotCreatedException(errorsMessage.toString());
         }
         sensorsService.save(sensor);
+
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
