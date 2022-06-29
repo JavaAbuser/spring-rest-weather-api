@@ -1,4 +1,4 @@
-package com.javaabuser.restapi.exceptions.sensor;
+package com.javaabuser.restapi.exceptions;
 
 import lombok.AllArgsConstructor;
 import lombok.Getter;
