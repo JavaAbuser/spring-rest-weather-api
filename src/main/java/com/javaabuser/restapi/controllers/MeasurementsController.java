@@ -1,8 +1,8 @@
 package com.javaabuser.restapi.controllers;
 
 import com.javaabuser.restapi.DTO.MeasurementDTO;
-import com.javaabuser.restapi.exceptions.sensor.ErrorResponse;
-import com.javaabuser.restapi.exceptions.measurement.NotCreatedException;
+import com.javaabuser.restapi.exceptions.ErrorResponse;
+import com.javaabuser.restapi.exceptions.NotCreatedException;
 import com.javaabuser.restapi.models.Measurement;
 import com.javaabuser.restapi.services.MeasurementsService;
 import com.javaabuser.restapi.util.MeasurementValidator;
@@ -38,6 +38,12 @@ public class MeasurementsController {
         return ResponseEntity.status(HttpStatus.OK).body(measurementsService.findAll().stream().map(this::convertToMeasurementDTO).collect(Collectors.toList()));
     }
 
+    @GetMapping("/rainyDaysCount")
+    public ResponseEntity<Long> getRainyDaysCount(){
+        Long rainyDaysCount = measurementsService.findAll().stream().filter(Measurement::isRaining).count();
+        return new ResponseEntity<Long>(rainyDaysCount, HttpStatus.OK);
+    }
+
     @PostMapping("/add")
     public ResponseEntity<HttpStatus> addMeasurement(@RequestBody @Valid MeasurementDTO measurementDTO,
                                                      BindingResult bindingResult) {
@@ -45,17 +51,8 @@ public class MeasurementsController {
 
         measurementValidator.validate(measurement, bindingResult);
 
-        if(bindingResult.hasErrors()){
-            StringBuilder errorsMessage = new StringBuilder();
-
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for(FieldError error : errors){
-                errorsMessage
-                        .append(error.getField())
-                        .append("-").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new NotCreatedException(errorsMessage.toString());
+        if(!bindErrors(bindingResult).isEmpty()){
+            throw new NotCreatedException(bindErrors(bindingResult));
         }
 
         measurementsService.save(measurement);
@@ -69,6 +66,20 @@ public class MeasurementsController {
 
     private MeasurementDTO convertToMeasurementDTO(Measurement measurement){
         return modelMapper.map(measurement, MeasurementDTO.class);
+    }
+
+    private String bindErrors(BindingResult bindingResult){
+        StringBuilder errorsMessage = new StringBuilder();
+        if(bindingResult.hasErrors()){
+            List<FieldError> errors = bindingResult.getFieldErrors();
+            for(FieldError error : errors){
+                errorsMessage
+                        .append(error.getField())
+                        .append(" - ").append(error.getDefaultMessage())
+                        .append(";");
+            }
+        }
+        return errorsMessage.toString();
     }
 
     @ExceptionHandler
