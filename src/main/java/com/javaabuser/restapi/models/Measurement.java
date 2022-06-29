@@ -21,7 +21,7 @@ public class Measurement {
     private int value;
 
     @NotNull
-    @Column(name = "isRaining")
+    @Column(name = "is_raining")
     private boolean isRaining;
 
     @ManyToOne
@@ -29,6 +29,6 @@ public class Measurement {
     private Sensor sensor;
 
     @Temporal(TemporalType.TIMESTAMP)
-    @Column(name = "createdAt")
+    @Column(name = "created_at")
     private Date createdAt;
 }
