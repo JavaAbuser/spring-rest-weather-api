@@ -1,6 +1,5 @@
 package com.javaabuser.restapi.DTO;
 
-import com.javaabuser.restapi.models.Sensor;
 import lombok.Getter;
 import lombok.NoArgsConstructor;
 import lombok.Setter;
@@ -18,6 +17,5 @@ public class MeasurementDTO {
     private double value;
     @NotNull
     private boolean isRaining;
-    @NotNull
-    private Sensor sensor;
+    private SensorDTO sensor;
 }
