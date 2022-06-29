@@ -1,4 +1,4 @@
-package com.javaabuser.restapi.exceptions.sensor;
+package com.javaabuser.restapi.exceptions;
 
 public class NotFoundException extends RuntimeException {
     public NotFoundException(String message) {
