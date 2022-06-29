@@ -17,6 +17,7 @@ import org.springframework.web.bind.annotation.*;
 import javax.validation.Valid;
 import java.util.Date;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @RestController
 @RequestMapping("/measurements")
@@ -33,8 +34,8 @@ public class MeasurementsController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<Measurement>> getMeasurements(){
-        return ResponseEntity.status(HttpStatus.OK).body(measurementsService.findAll());
+    public ResponseEntity<List<MeasurementDTO>> getMeasurements(){
+        return ResponseEntity.status(HttpStatus.OK).body(measurementsService.findAll().stream().map(this::convertToMeasurementDTO).collect(Collectors.toList()));
     }
 
     @PostMapping("/add")
