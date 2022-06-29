@@ -39,12 +39,14 @@ public class MeasurementsController {
 
     @PostMapping("/add")
     public ResponseEntity<HttpStatus> addMeasurement(@RequestBody @Valid MeasurementDTO measurementDTO,
-                                                     BindingResult bindingResult){
+                                                     BindingResult bindingResult) {
         Measurement measurement = convertToMeasurement(measurementDTO);
+
         measurementValidator.validate(measurement, bindingResult);
 
         if(bindingResult.hasErrors()){
             StringBuilder errorsMessage = new StringBuilder();
+
             List<FieldError> errors = bindingResult.getFieldErrors();
             for(FieldError error : errors){
                 errorsMessage
@@ -56,6 +58,7 @@ public class MeasurementsController {
         }
 
         measurementsService.save(measurement);
+
         return ResponseEntity.ok(HttpStatus.OK);
     }
 
@@ -70,6 +73,7 @@ public class MeasurementsController {
     @ExceptionHandler
     private ResponseEntity<ErrorResponse> handleNotCreatedException(NotCreatedException exception){
         ErrorResponse errorResponse = new ErrorResponse(exception.getMessage(), new Date());
+
         return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 }
