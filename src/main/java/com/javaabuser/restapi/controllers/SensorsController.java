@@ -1,9 +1,7 @@
 package com.javaabuser.restapi.controllers;
 
 import com.javaabuser.restapi.DTO.SensorDTO;
-import com.javaabuser.restapi.exceptions.sensor.ErrorResponse;
-import com.javaabuser.restapi.exceptions.sensor.NotCreatedException;
-import com.javaabuser.restapi.exceptions.sensor.NotFoundException;
+import com.javaabuser.restapi.exceptions.*;
 import com.javaabuser.restapi.models.Sensor;
 import com.javaabuser.restapi.services.SensorsService;
 import com.javaabuser.restapi.util.SensorValidator;
@@ -35,7 +33,7 @@ public class SensorsController {
     }
 
     @GetMapping()
-    public ResponseEntity<List<SensorDTO>> getSensors(@RequestParam(value = "name", required = false) String name){
+    public ResponseEntity<List<SensorDTO>> get(@RequestParam(value = "name", required = false) String name){
         if(name != null){
             if(sensorsService.findByName(name).isPresent()){
                 return ResponseEntity.status(HttpStatus.OK).body(sensorsService.findByName(name).stream().map(this::convertToSensorDTO).collect(Collectors.toList()));
@@ -53,23 +51,28 @@ public class SensorsController {
     public ResponseEntity<HttpStatus> register(@RequestBody @Valid SensorDTO sensorDTO,
                                                BindingResult bindingResult){
         Sensor sensor = convertToSensor(sensorDTO);
-
         sensorValidator.validate(sensor, bindingResult);
 
-        if(bindingResult.hasErrors()){
-            StringBuilder errorsMessage = new StringBuilder();
-            List<FieldError> errors = bindingResult.getFieldErrors();
-            for(FieldError error : errors){
-                errorsMessage
-                        .append(error.getField())
-                        .append(" - ").append(error.getDefaultMessage())
-                        .append(";");
-            }
-            throw new NotCreatedException(errorsMessage.toString());
+        if(!bindErrors(bindingResult).isEmpty()){
+            throw new NotCreatedException(bindErrors(bindingResult));
         }
+
         sensorsService.save(sensor);
 
         return ResponseEntity.ok(HttpStatus.OK);
+    }
+
+    @DeleteMapping("/delete")
+    public ResponseEntity<HttpStatus> delete(@RequestBody @Valid SensorDTO sensorDTO, BindingResult bindingResult){
+        Sensor sensor = convertToSensor(sensorDTO);
+
+        sensorValidator.validate(sensor, bindingResult);
+
+        if(!bindErrors(bindingResult).isEmpty()){
+            throw new NotDeletedException(bindErrors(bindingResult));
+        }
+
+        return ResponseEntity.ok(HttpStatus.NO_CONTENT);
     }
 
     private Sensor convertToSensor(SensorDTO sensorDTO){
@@ -79,15 +82,39 @@ public class SensorsController {
         return modelMapper.map(sensor, SensorDTO.class);
     }
 
+    private String bindErrors(BindingResult bindingResult){
+        StringBuilder errorsMessage = new StringBuilder();
+        if(bindingResult.hasErrors()){
+            List<FieldError> errors = bindingResult.getFieldErrors();
+            for(FieldError error : errors){
+                errorsMessage
+                        .append(error.getField())
+                        .append(" - ").append(error.getDefaultMessage())
+                        .append(";");
+            }
+        }
+
+        return errorsMessage.toString();
+    }
+
     @ExceptionHandler
     private ResponseEntity<ErrorResponse> handleNotCreatedException(NotCreatedException exception){
         ErrorResponse errorResponse = new ErrorResponse(exception.getMessage(), new Date());
+
         return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.BAD_REQUEST);
     }
 
     @ExceptionHandler
     private ResponseEntity<ErrorResponse> handleNotFoundException(NotFoundException exception){
         ErrorResponse errorResponse = new ErrorResponse(exception.getMessage(), new Date());
+
         return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler
+    private ResponseEntity<ErrorResponse> handleNotDeletedException(NotDeletedException exception){
+        ErrorResponse errorResponse = new ErrorResponse(exception.getMessage(), new Date());
+
+        return new ResponseEntity<ErrorResponse>(errorResponse, HttpStatus.NOT_MODIFIED);
     }
 }
