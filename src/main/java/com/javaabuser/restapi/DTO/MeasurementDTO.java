@@ -17,5 +17,6 @@ public class MeasurementDTO {
     private double value;
     @NotNull
     private boolean isRaining;
+    @NotNull
     private SensorDTO sensor;
 }
