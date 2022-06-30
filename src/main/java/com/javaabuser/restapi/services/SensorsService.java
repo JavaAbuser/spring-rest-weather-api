@@ -31,4 +31,9 @@ public class SensorsService {
     public void save(Sensor sensor){
         sensorsRepository.save(sensor);
     }
+
+    @Transactional
+    public void delete(Sensor sensor){
+        sensorsRepository.delete(sensor);
+    }
 }
