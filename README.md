@@ -32,7 +32,7 @@ Install the repository locally or run with IDE
 git clone https://github.com/JavaAbuser/spring-mvc-digital-library.git
 ```
 ```sh
-mvn spring-boot:run
+mvnw spring-boot:run
 ```
 ![image](https://user-images.githubusercontent.com/43775453/176567067-0f42fd41-723a-493e-af03-1d8f8d27a8e3.png)
 ![image](https://user-images.githubusercontent.com/43775453/176566675-dfc41266-8823-45e4-8daf-93db9460a2e5.png)
