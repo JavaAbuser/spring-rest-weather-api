@@ -26,7 +26,7 @@ And of course Weather Measurements is open source with a public repository on Gi
 ## Installation
 
 Application requires [Java](https://www.oracle.com/java/technologies/downloads/#java11) v11+ to run.
-Install the repository locally and run with IDE
+Install the repository locally or run with IDE
 
 ```sh
 git clone https://github.com/JavaAbuser/spring-mvc-digital-library.git
