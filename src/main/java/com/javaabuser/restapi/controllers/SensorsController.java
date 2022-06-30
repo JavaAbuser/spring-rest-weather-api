@@ -66,11 +66,13 @@ public class SensorsController {
     public ResponseEntity<HttpStatus> delete(@RequestBody @Valid SensorDTO sensorDTO, BindingResult bindingResult){
         Sensor sensor = convertToSensor(sensorDTO);
 
-        sensorValidator.validate(sensor, bindingResult);
+        sensorValidator.validateOnDelete(sensor, bindingResult);
 
         if(!bindErrors(bindingResult).isEmpty()){
             throw new NotDeletedException(bindErrors(bindingResult));
         }
+
+        sensorsService.delete(sensor);
 
         return ResponseEntity.ok(HttpStatus.NO_CONTENT);
     }
